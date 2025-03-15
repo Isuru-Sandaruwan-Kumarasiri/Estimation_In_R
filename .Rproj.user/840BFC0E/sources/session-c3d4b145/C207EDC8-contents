@@ -187,7 +187,6 @@ sample1 <- c(52, 55, 49, 50, 53)
 sample2 <- c(47, 50, 48, 51, 49)
 
 # Perform two-sample Z-test
-? t.test()
 t.test(x = sample1, y = sample2,  alternative = "two.sided",var.equal=TRUE)
 ```
 
@@ -234,6 +233,65 @@ n=1000
 margin_error = z*sqrt(p*(1-p)/n)
 Interval=c(p-margin_error,p+margin_error)
 Interval
+
+```
+#### Case 1: For large sample (Using Binomial Distribution)
+
+
+```{r}
+library(epitools)
+
+binom.exact(x=48,n=100,conf.level=0.95)
+binom.wilson(x=498,n=100,conf.level = 0.95)
+binom.approx(x=498,n=100,conf.level = 0.95)
+
+```
+#### Case 2: For small sample (Using Binomial Distribution)
+
+When sample size is small, confidence interval for population can be calculated using binom.test() function.
+
+```{r}
+
+gender = c("f","f","f","m","m","f","f","m","m","f")
+table(gender)
+binom.test(6,10,conf.level = 0.95)
+```
+### Confidence Intervals for Variance
+
+#### Case 1: Under normality assumption
+
+User defined function to obtain confidence interval for variance.
+
+```{r}
+ var.interval = function(data, conf.level = 0.95) {
+ df = length(data) - 1
+ chilower = qchisq((1 - conf.level)/2, df)
+ chiupper = qchisq((1 - conf.level)/2, df, lower.tail = FALSE)
+ v = var(data)
+ c(df * v/chiupper, df * v/chilower)
+ }
+ 
+ lizard = c(6.2, 6.6, 7.1, 7.4, 7.6, 7.9, 8, 8.3, 8.4, 8.5, 8.6, 8.8, 8.8, 9.1, 9.2, 9.4, 9.4, 9.7, 9.9, 10.2, 10.4, 10.8, 11.3, 11.9)
+
+ var.interval(lizard)
+```
+
+#### Case 2: Under non-normality assumption
+
+When no assumption is made about data, a bootstrap method is used to obtain confidence intervals for the population variance.
+
+
+```{r}
+
+library(boot)
+
+blood_pressure <- c(72,66,64,66,40,74,50,70,96,92,74,80,60,72,84,74,80,70,88,94)
+
+variance <- function(x,indicies) var(x[indicies])
+  
+level.boot <- boot(blood_pressure,variance,R=999)
+boot.ci(level.boot,conf = 0.95)
+
 
 ```
 

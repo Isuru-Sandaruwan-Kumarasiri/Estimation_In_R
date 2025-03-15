@@ -187,7 +187,6 @@ sample1 <- c(52, 55, 49, 50, 53)
 sample2 <- c(47, 50, 48, 51, 49)
 
 # Perform two-sample Z-test
-? t.test()
 t.test(x = sample1, y = sample2,  alternative = "two.sided",var.equal=TRUE)
 ```
 
@@ -236,4 +235,26 @@ Interval=c(p-margin_error,p+margin_error)
 Interval
 
 ```
+#### Case 1: For large sample (Using Binomial Distribution)
+
+
+```{r}
+library(epitools)
+
+binom.exact(x=48,n=100,conf.level=0.95)
+binom.wilson(x=498,n=100,conf.level = 0.95)
+binom.approx(x=498,n=100,conf.level = 0.95)
+
+```
+#### Case 2: For small sample (Using Binomial Distribution)
+
+When sample size is small, confidence interval for population can be calculated using binom.test() function.
+
+```{r}
+
+gender = c("f","f","f","m","m","f","f","m","m","f")
+table(gender)
+binom.test(6,10,conf.level = 0.95)
+```
+
 

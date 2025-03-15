@@ -1,0 +1,3 @@
+"0","library(epitools)"
+"0",""
+"0","binom.exact(x=48,n=100,conf.level=0.95)"

@@ -550,9 +550,7 @@ unknown variances (small samples).</h4>
 sample2 &lt;- c(47, 50, 48, 51, 49)
 
 # Perform two-sample Z-test
-? t.test()</code></pre>
-<pre><code>## starting httpd help server ... done</code></pre>
-<pre class="r"><code>t.test(x = sample1, y = sample2,  alternative = &quot;two.sided&quot;,var.equal=TRUE)</code></pre>
+t.test(x = sample1, y = sample2,  alternative = &quot;two.sided&quot;,var.equal=TRUE)</code></pre>
 <pre><code>## 
 ##  Two Sample t-test
 ## 
@@ -571,8 +569,9 @@ sample2 &lt;- c(47, 50, 48, 51, 49)
 sample2 &lt;- c(47, 50, 48, 51, 49)
 
 # Perform two-sample Z-test
-? t.test()
-t.test(x = sample1, y = sample2,  alternative = &quot;two.sided&quot;,var.equal=FALSE)</code></pre>
+? t.test()</code></pre>
+<pre><code>## starting httpd help server ... done</code></pre>
+<pre class="r"><code>t.test(x = sample1, y = sample2,  alternative = &quot;two.sided&quot;,var.equal=FALSE)</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -622,6 +621,44 @@ margin_error = z*sqrt(p*(1-p)/n)
 Interval=c(p-margin_error,p+margin_error)
 Interval</code></pre>
 <pre><code>## [1] 0.4670105 0.5289895</code></pre>
+</div>
+<div id="case-1-for-large-sample-using-binomial-distribution" class="section level4">
+<h4>Case 1: For large sample (Using Binomial Distribution)</h4>
+<pre class="r"><code>library(epitools)
+
+binom.exact(x=48,n=100,conf.level=0.95)</code></pre>
+<pre><code>##    x   n proportion     lower     upper conf.level
+## 1 48 100       0.48 0.3790055 0.5822102       0.95</code></pre>
+<pre class="r"><code>binom.wilson(x=498,n=100,conf.level = 0.95)</code></pre>
+<pre><code>## Warning in sqrt(((x * (n - x))/n^3) + Z^2/(4 * n^2)): NaNs produced</code></pre>
+<pre><code>##     x   n proportion lower upper conf.level
+## 1 498 100       4.98   NaN   NaN       0.95</code></pre>
+<pre class="r"><code>binom.approx(x=498,n=100,conf.level = 0.95)</code></pre>
+<pre><code>## Warning in sqrt(x * (n - x)/(n^3)): NaNs produced</code></pre>
+<pre><code>##     x   n proportion lower upper conf.level
+## 1 498 100       4.98   NaN   NaN       0.95</code></pre>
+</div>
+<div id="case-2-for-small-sample-using-binomial-distribution" class="section level4">
+<h4>Case 2: For small sample (Using Binomial Distribution)</h4>
+<p>When sample size is small, confidence interval for population can be
+calculated using binom.test() function.</p>
+<pre class="r"><code>gender = c(&quot;f&quot;,&quot;f&quot;,&quot;f&quot;,&quot;m&quot;,&quot;m&quot;,&quot;f&quot;,&quot;f&quot;,&quot;m&quot;,&quot;m&quot;,&quot;f&quot;)
+table(gender)</code></pre>
+<pre><code>## gender
+## f m 
+## 6 4</code></pre>
+<pre class="r"><code>binom.test(6,10,conf.level = 0.95)</code></pre>
+<pre><code>## 
+##  Exact binomial test
+## 
+## data:  6 and 10
+## number of successes = 6, number of trials = 10, p-value = 0.7539
+## alternative hypothesis: true probability of success is not equal to 0.5
+## 95 percent confidence interval:
+##  0.2623781 0.8784477
+## sample estimates:
+## probability of success 
+##                    0.6</code></pre>
 </div>
 </div>
 
