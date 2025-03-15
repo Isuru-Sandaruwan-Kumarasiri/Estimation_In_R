@@ -1,0 +1,187 @@
+---
+title: "Point_Estimation"
+author: "S20426"
+date: "2025-02-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+# Example programme for Posson MLE
+
+# Set the Poisson rate parameter and the number of samples we'll use
+# for estimation
+lambda    <- 10 
+n_samples <- 30
+
+# Simulate data from a Poisson distribution
+x_poisson <- rpois( n = n_samples, lambda = lambda )
+
+# Objective function for the Poisson MLE problem
+# The function f_easy is just the log-likelihood function
+f_easy <- function( x, data ) -sum( dpois( x = data, lambda = x, log = TRUE ) )
+
+# Set the lower and upper bounds for the domain
+lower_bound <- 0
+upper_bound <- 1000
+
+# Calling the optimise function
+optimise( f = f_easy, 
+          interval = c(lower_bound, upper_bound), 
+          data = x_poisson 
+)
+
+
+```
+
+# Maximum Likehood Estimation
+
+
+## Example 01
+```{r}
+
+
+likelihood <- function(p) {
+  n_heads <- 103
+  n_tails <- 97
+  n_flips <- n_heads + n_tails
+  
+
+  return((p^n_heads) * ((1 - p)^n_tails))
+}
+
+result <- optimize(likelihood, interval = c(0, 1), maximum = TRUE)
+?
+cat("The MLE for p is:", result$maximum, "\n")
+
+```
+
+## Example 02
+```{r}
+weights <- c(59.001, 38.267, 41.025, 35.555, 46.690, 20.994, 39.407, 52.780, 
+             57.495, 52.416, 60.062, 48.149, 40.182, 50.929, 49.472, 49.197, 
+             43.459, 40.493, 60.196, 58.590, 53.645, 53.837, 61.134, 62.115, 
+             46.517, 41.404, 56.500, 53.281, 44.821, 47.610, 51.178, 58.315, 
+             34.411, 47.795, 41.828, 60.767, 60.797, 51.421, 51.570, 48.313, 
+             47.310, 58.078, 38.753, 35.692, 50.604, 42.070, 53.403, 47.405, 
+             36.952, 53.682)
+
+fun <- function(x, data) {
+  return(dnorm(x, mean(data), sd(data)))
+}
+
+result <- optimise(f = fun, interval = c(-100, 100), data = weights)
+
+
+print(result)
+
+
+
+```
+
+
+## Confidence Interval For Mean
+
+### Case 1 : When data is normal / large sample and σ is
+###          known
+```{r}
+# set.seed(42) Ensuring reproducibility in simulations.
+#same sequence of random numbers is generated every time you run the code.
+
+
+set.seed(20)
+sample_size<-500
+pop_div<-10
+weight<-sample(45:80,size=sample_size,replace = T)
+sample_mean<- mean(weight)
+z_critical <- qnorm(0.975) # calculate the z - critical value
+margin_error <-z_critical*(pop_div/sqrt(sample_size))
+
+
+vec<-c(sample_mean - margin_error,sample_mean+ margin_error)
+vec
+
+```
+
+### Case 2 : When data is normal / large sample and σ is
+###          unknown
+
+```{r}
+set.seed(20)
+large_sample_weight <- sample(weight,150)
+large_sample_t_critical <- qt(0.975,df=149)  # find the t value
+large_sample_mean <- mean(large_sample_weight)
+large_sample_stdev <- sd(large_sample_weight)
+
+
+large_sample_margin_of_error <- large_sample_t_critical*(large_sample_stdev/sqrt(150))
+
+large_sample_confidence_interval <- c(large_sample_mean- large_sample_margin_of_error,large_sample_mean + large_sample_margin_of_error)
+
+large_sample_confidence_interval
+```
+
+### Case 3 : When data is non-normal /small samples
+#### For this , bootstrap approach is used as follows
+
+```{r}
+#When the data is non-normal or when sample sizes are small, traditional parametric methods (like #using normal distribution assumptions) may not be reliable. Bootstrapping is a resampling technique #that helps estimate the sampling distribution of a statistic (e.g., the mean) without assuming #normality.
+
+
+
+library(boot)
+
+blood_pressure <- c(72,66,64,66,40,74,50,70,96,92,74,80,60,72,84,74,80,88,94)
+
+mean_fn <- function(x ,indices){
+  return (mean(x[indices]))
+}
+#Performs bootstrap resampling 999 times (R=999).
+#The argument indices represents the randomly selected indices in each bootstrap resample.
+
+level.boot <- boot(blood_pressure  , mean_fn ,R=999)
+boot.ci(level.boot,conf = 0.95)
+
+```
+
+## Confidence Interval For Difference Of Means
+
+### Case 1 : Sampling from two independant normal distribution with known variances.
+
+```{r}
+library("BSDA")
+
+
+x <- c(45, 50, 55, 60, 65) 
+y <- c(40, 42, 47, 53, 58)  
+
+
+sigma.x <- 5  
+sigma.y <- 6  
+
+
+z.test(x, y, alternative = "two.sided", sigma.x = sigma.x, sigma.y = sigma.y, conf.level = 0.95)
+
+
+
+
+```
+### Case 1 : Sampling from two independant normal distributions with unknown variances(small      samples).
+
+
+```{r}
+t.test(x,y, alternative = "two.sided" , var.equal = TRUE ,conf.level = 0.95)
+
+# var.equal --> variance are equal
+```
+
+### When population variances are unequal
+
+```{r}
+
+t.test(x,y, alternative = "two.sided",var.equal = FALSE , conf.level =  0.95 )
+
+```
+
