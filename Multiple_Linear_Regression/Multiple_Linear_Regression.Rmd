@@ -1,0 +1,239 @@
+---
+title: "Multiple_Linear_Regression"
+author: "S20426"
+date: "2025-03-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## How to fit a multiple linear regression model?
+
+
+### Steps you can follow:
+
+#### 01.Graphical Interpretation
+#### 02.Parameter Estimation
+#### 03.Tests on Parameters
+#### 04.Analysis of Variance
+#### 05.Interpretation and Prediction
+
+
+##                    01.Graphical Interpretation
+
+```{r}
+
+```
+
+
+```{r}
+# install.packages("AppliedPredictiveModeling")
+library(AppliedPredictiveModeling)
+data(abalone)
+attach(abalone)
+# head(abalone)
+# summary(abalone)
+# cor(abalone[,-1]) correlation matrix
+```
+
+###  Draw a correlogram using corrplot() function
+
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+corrplot(cor(abalone[,-1]), tl.col = "red")
+```
+
+###  Draw scatter plots using chart.Correlation():
+
+```{r include=FALSE}
+# install.packages("PerformanceAnalytics")
+library("PerformanceAnalytics")
+```
+
+
+```{r}
+# install.packages("PerformanceAnalytics")
+# library("PerformanceAnalytics")
+chart.Correlation(abalone[,-1], histogram=TRUE, pch=19)
+```
+
+##                    02. Parameter Estimation
+
+#### Check For Missing Values
+
+```{r}
+sum(is.na(abalone))
+
+```
+
+
+```{r}
+model1 <- lm(Rings ~ as.factor(Type) + LongestShell + Diameter + 
+             WholeWeight + ShuckedWeight + VisceraWeight + ShellWeight, 
+             data = abalone)
+model1
+```
+
+#### Check Model Summary
+
+```{r}
+summary(model1)
+
+```
+```{r}
+head(abalone)
+```
+#### Create 2 columns For Type
+
+```{r}
+abalone$Type.I=ifelse(abalone$Type=="I",1,0)
+abalone$Type.M=ifelse(abalone$Type=="M",1,0)
+head(abalone)
+```
+
+```{r}
+model2 <-  lm(Rings~Type.I + Type.M+ LongestShell+ Diameter+ WholeWeight+ ShuckedWeight+ VisceraWeight+ ShellWeight,data=abalone)
+summary(model2)
+```
+#  Methods of building a multiple linear regression model
+
+### 01 Backward Elimination
+### 02 Forward Selection
+### 03 Bidirectional Elimination (Stepwise regression)
+
+## 01 Backward Elimination
+
+
+#### 1. Set a significance level for which data will stay in the model.
+
+#### 2. Next, fit the full model with all possible predictors.
+
+#### 3. Consider the predictor with the highest P-value. If the P-value is greater than the significance level, you’ll move to step four, otherwise, you’re done!
+
+#### 4. Remove that predictor with the highest P-value.
+
+#### 5. Fit the model without that predictor variable.
+
+#### 6. Go back to step 3, do it all over, and keep doing that until you come to a point where even the highest P-value is < SL.
+
+### I.Step() Function (AIC-Based Backward Elimination)
+
+
+* Uses Akaike Information Criterion (AIC) to decide which variables to remove.
+* AIC balances model fit and complexity:
+* Lower AIC = Better trade-off between accuracy and simplicity.
+* Stepwise removal continues until removing a variable increases AIC.
+* Can retain variables with high p-values if they improve overall model performance.
+
+
+```{r}
+model2 <-  lm(Rings~Type.I + Type.M+ LongestShell+ Diameter+ WholeWeight+ ShuckedWeight+ VisceraWeight+ ShellWeight,data=abalone)
+step.model <- step(model2, direction = "backward",trace=FALSE)
+summary(step.model)
+```
+
+### II.drop1SignifReg() (Significance-Based Backward Elimination)
+
+* Drops one variable at a time based on p-value until only significant variables (p < 0.05)   remain.
+* Uses hypothesis testing to justify variable inclusion.
+
+* More statistically rigorous but may remove useful variables if their effect is small.
+
+```{r}
+library(SignifReg)
+nullmodel = lm(Rings ~ 1, data=abalone)  
+fullmodel = lm(Rings ~ Type.I + Type.M + LongestShell + Diameter + WholeWeight + ShuckedWeight + VisceraWeight + ShellWeight, data=abalone)
+
+```
+
+
+```{r}
+scope = list(lower=formula(nullmodel), upper=formula(fullmodel))
+Sub.model = drop1SignifReg(fullmodel, scope, alpha = 0.05, criterion = "p-value", override = "TRUE")
+
+# This function iteratively removes the least significant predictor (highest p-value) until all remaining predictors are significant at alpha = 0.05.
+# criterion = "p-value" ensures the variable removal is based on significance.
+# override = "TRUE" forces the function to proceed even if some assumptions are not fully met.
+summary(Sub.model)
+
+
+```
+
+* Type.M (p = 0.597) and LongestShell (p = 0.977) have very high p-values.
+* Normally, these should be removed.
+* However, they might remain due to interactions, multicollinearity, or their effect on the overall model stability.
+* The function ensures that the model performs well as a whole rather than strictly eliminating variables with high p-values.
+
+
+## 02 Forward Selection
+
+1. Choose the significance level (SL = 0.05).
+2. Fit all possible simple regression models and select the one with the lowest P-value.
+3. Keep this variable and fit all possible models with one extra predictor added to the one you already have.
+4. Find the predictor with the lowest P-value. If P < Sl, go back to step 3. Otherwise, you’re done!
+
+### I Forward selection using SignifReg package
+
+```{r}
+library(SignifReg)
+nullmodel = lm(Rings~1, data=abalone)
+fullmodel = lm(Rings~Type.I + Type.M+ LongestShell+ Diameter+ WholeWeight+ ShuckedWeight+ VisceraWeight+ ShellWeight, data=abalone)
+scope = list(lower=formula(nullmodel),upper=formula(fullmodel))
+
+sub.model2=add1SignifReg(nullmodel,scope, alpha = 0.05, criterion = "p-value",override="TRUE")
+summary(sub.model2)
+```
+### II Stepwise Regression
+
+
+1.Select a significance level to enter and a significance level to stay.
+
+2.Perform the next step of forward selection where you add the new variable.
+
+3.Now perform all of the steps of backward elimination.
+
+4.Now head back to step two, then move forward to step 3, and so on until no new variables can enter and no new variables can exit.
+```{r}
+model2 <-  lm(Rings~Type.I + Type.M+ LongestShell+ Diameter+ WholeWeight+ ShuckedWeight+ VisceraWeight+ ShellWeight,data=abalone)
+step.model2 <- step(model2, direction = "forward", trace=FALSE)
+summary(step.model2)
+```
+###  Backward Elimination (Stepwise Backward Selection)
+ Starts with: The full model (all predictors included).
+ Process:
+
+Removes the least significant predictor (highest p-value) one at a time.
+Reassesses the model after each removal.
+Stops when all remaining predictors are statistically significant (p-value < α, usually 0.05).
+
+#### Advantages:
+nsures that we do not miss important predictors.
+tarts with the best-fitting model (high R²) and simplifies it.
+
+#### Disadvantages:
+Can keep irrelevant predictors if they interact with others.
+omputationally expensive for large datasets.
+
+###  Forward Selection (Stepwise Forward Selection)
+Starts with: The null model (only intercept, no predictors).
+Process:
+
+Adds the most significant predictor (lowest p-value or highest contribution to model improvement).
+Continues adding variables one at a time based on statistical significance.
+Stops when adding another variable does not significantly improve the model (p-value > α).
+
+#### Advantages:
+tarts with a simple model and gradually builds complexity.
+ess risk of overfitting.
+
+#### Disadvantages:
+ght miss important predictors that are only significant when combined with others.
+lower than backward elimination because it starts from scratch.
+
+
+#   Model Diagnosis
+
+
