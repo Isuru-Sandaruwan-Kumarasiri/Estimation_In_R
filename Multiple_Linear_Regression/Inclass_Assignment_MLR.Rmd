@@ -1,0 +1,150 @@
+---
+title: "Inclass_Assignment_MLR"
+author: "S20426"
+date: "2025-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### 1 Load the Dataset
+
+```{r}
+library(AppliedPredictiveModeling)
+data(abalone)
+attach(abalone)
+```
+
+### 2 Graphical Interpretation
+
+#### Draw a correlogram using corrplot() function
+
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+corrplot(cor(abalone[,-1]), tl.col = "red")
+```
+
+
+
+####  Draw scatter plots using chart.Correlation():
+
+```{r include=FALSE}
+# install.packages("PerformanceAnalytics")
+library("PerformanceAnalytics")
+```
+
+```{r}
+# install.packages("PerformanceAnalytics")
+# library("PerformanceAnalytics")
+chart.Correlation(abalone[,-1], histogram=TRUE, pch=19)
+```
+
+
+###  02. Parameter Estimation
+
+#### Check For Missing Values
+
+```{r}
+sum(is.na(abalone))
+
+```
+
+
+```{r}
+model1 <- lm(Rings ~ as.factor(Type) + LongestShell + Diameter + 
+             WholeWeight + ShuckedWeight + VisceraWeight + ShellWeight, 
+             data = abalone)
+model1
+```
+
+#### Check Model Summary
+
+```{r}
+summary(model1)
+
+```
+
+
+
+#### Create 2 columns For Type
+
+```{r}
+abalone$Type.I=ifelse(abalone$Type=="I",1,0)
+abalone$Type.M=ifelse(abalone$Type=="M",1,0)
+head(abalone)
+```
+
+```{r}
+full_model <-  lm(Rings~Type.I + Type.M+ LongestShell+ Diameter+ WholeWeight+ ShuckedWeight+ VisceraWeight+ ShellWeight,data=abalone)
+summary(full_model)
+```
+
+
+### 03 Test on Parameters
+
+```{r}
+library(MASS)
+step_model <- stepAIC(full_model, direction = "both")
+summary(step_model)
+
+```
+
+### 04 Analysis of Variance
+
+
+#### check model assumption
+
+```{r}
+par(mfrow =c(2,2))
+plot(step_model)
+```
+
+#### Identifying Influential Outliers
+
+```{r}
+standard_res=rstandard(step_model)
+plot(fitted(step_model), standard_res)
+```
+
+
+#### Studentized Residuals
+
+```{r}
+student_res=rstudent(step_model)
+plot(fitted(step_model), student_res)
+```
+
+#### Variance inflation factor
+
+```{r}
+library(car)
+vif_values <- vif(step_model)          
+barplot(vif_values, main = "VIF Values", horiz = TRUE, col = "steelblue") 
+abline(v = 5, lwd = 3, lty = 2)    
+
+```
+
+### 05 Interpretation and Prediction
+
+#### Testing the multicollinearity among the predictor variables
+
+```{r}
+library(mctest)
+omcdiag(mod=step_model)     
+
+# OR
+
+#imcdiag(mod=step.model)   
+
+```
+#### model summary()
+
+```{r}
+summary(step_model)
+```
+
+

@@ -1,0 +1,46 @@
+---
+title: "IN-CLASS ASSIGNMENT-2"
+author: "S20426"
+date: "2025-04-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(MASS)
+data("Boston")
+colnames(Boston)
+head(Boston)
+```
+
+```{r}
+library(glmnet)
+x_data <- data.matrix(Boston[,c("crim","zn","indus","chas","nox","rm","age","dis","rad","tax","ptratio","black","lstat")])
+y_data <- Boston[,"medv"]
+
+
+set.seed(123)
+cv_model <-cv.glmnet(x_data,y_data,alpha=0)
+best_lambda <- cv_model$lambda.min
+
+model_Ridge<- glmnet(x_data,y_data,alpha =0 ,lambda=best_lambda)
+coef(model_Ridge)
+
+
+```
+```{r}
+y_predicted <- predict(model_Ridge, s = best_lambda, newx = x_data)
+
+#find SST and SSE
+sst <- sum((y_data - mean(y_data))^2)
+sse <- sum((y_predicted - y_data)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+
+```
+

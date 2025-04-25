@@ -1,0 +1,272 @@
+---
+title: "Penalized Regression"
+author: "S20426"
+date: "2025-04-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(glmnet)
+```
+
+# Penalized Regression
+
+
+Penalized regression methods introduce a penalty term to shrink regression coefficients, preventing overfitting and improving model generalizability. These techniques are particularly useful for datasets with multicollinearity or high dimensionality. Below is an explanation of three key methods with R implementations:
+
+####  Includes a penalty term to reduce (i.e. shrink) the coefficient values towards zero.
+
+####  As such, the variables with minor contribution to the outcome have their coefficients close to zero.
+
+
+## Method 1 : Ridge Regression 
+
+
+Ridge regression is a technique used in linear regression to address multicollinearity (high correlation among predictor variables) and prevent overfitting. It achieves this by introducing a penalty term to the cost function, shrinking the regression coefficients towards zero
+
+##### 1 .Multicollinearity Problem:
+In ordinary least squares (OLS) regression, multicollinearity can lead to large variances in coefficient estimates, making the model unstable and less interpretable.
+Ridge regression reduces this instability by penalizing large coefficients.
+
+##### 2. Bias-Variance Tradeoff:
+Ridge regression introduces bias into the model but reduces variance, leading to more reliable predictions.
+
+
+```{r}
+
+x_var <- data.matrix(mtcars[, c("hp", "wt", "drat")])
+y_var <- mtcars[, "mpg"]
+lambda_seq <- 10^seq(2, -2, by = -.1)
+fit <- glmnet(x_var, y_var, alpha = 0, lambda  = lambda_seq)
+summary(fit)
+```
+```{r}
+# Get coefficients of all 100 models
+ridge_coef <- coef(fit)
+
+# Display coefficients for 7 models. 
+round(ridge_coef[, c(1:3, 38:41)], 3)
+```
+#### We can also produce a Trace plot to visualize how the coefficient estimates changed as a result of increasing λ
+
+```{r}
+plot(fit, xvar ="lambda")
+```
+### Choose an Optimal Value for λ
+
+glmnet has the function cv.glmnet() that performs k-fold cross validation using k = 10 folds.
+
+```{r}
+
+set.seed(123)
+#perform k-fold cross-validation to find optimal lambda value
+cv_model <- cv.glmnet(x_var, y_var, alpha = 0)
+
+#find optimal lambda value that minimizes test MSE
+best_lambda <- cv_model$lambda.min
+best_lambda
+
+```
+### Plot of MSE by lambda value
+
+```{r}
+plot(cv_model)
+```
+### Final Model
+
+```{r}
+final_model <- glmnet(x_var, y_var, alpha = 0, lambda = best_lambda)
+coef(final_model)
+```
+
+###  Test the Model using R`2
+
+```{r}
+y_predicted <- predict(final_model, s = best_lambda, newx = x_var)
+
+#find SST and SSE
+sst <- sum((y_var - mean(y_var))^2)
+sse <- sum((y_predicted - y_var)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+```
+
+## Method 2 : Lasso regression
+
+Lasso Regression (L1 Regularization): Shrinks some coefficients completely to zero, meaning it selects only the most important predictors. This makes the model simpler and easier to interpret.
+
+Ridge Regression (L2 Regularization): Shrinks all coefficients but does not set any to zero. It keeps all predictors in the model but reduces their impact.
+
+#### When to Use Each:
+Lasso is better when only a few predictors have a strong influence, and the rest are almost irrelevant. Since it can eliminate less important variables, it results in a simpler model.
+
+Ridge is better when many predictors contribute equally to the outcome. Instead of removing variables, ridge regression reduces their effect to prevent overfitting.
+
+In short, lasso is good for feature selection, while ridge is better when you expect all predictors to matter to some extent.
+
+### Computing Lasso Regression In R 
+
+```{r}
+# Find the best lambda using cross-validation
+set.seed(123) 
+cvl <- cv.glmnet(x_var, y_var, alpha = 1)
+# Display the best lambda value
+cvl$lambda.min
+```
+
+```{r}
+# Fit the final model on the training data
+model_lasso <- glmnet(x_var, y_var, alpha = 1, lambda = cvl$lambda.min)
+# Dsiplay regression coefficients
+coef(model_lasso)
+```
+###  Test the Model using R`2
+
+```{r}
+y_predicted <- predict(model_lasso, s = cvl$lambda.min, newx = x_var)
+
+#find SST and SSE
+sst <- sum((y_var - mean(y_var))^2)
+sse <- sum((y_predicted - y_var)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+```
+## Method 3 : Elastic net regession
+
+Elastic Net Regression is a combination of two popular regression techniques: LASSO (L1 regularization) and Ridge Regression (L2 regularization).
+
+LASSO (L1 penalty) shrinks some coefficients to zero, effectively selecting important features.
+
+Ridge (L2 penalty) shrinks coefficients smoothly, preventing overfitting but keeping all features.
+
+Elastic Net combines both, allowing it to shrink some coefficients while completely eliminating others when needed.
+
+In R programming, the caret package makes it easy to apply Elastic Net regression. It automatically tests different values of alpha (balance between L1 and L2) and lambda (strength of penalty) to find the best combination for the model. Behind the scenes, it uses the glmnet package to perform the actual computation.
+
+### Why use Elastic Net?
+##### Handles multicollinearity (highly correlated features).
+
+##### Can perform feature selection (like LASSO).
+
+##### Prevents overfitting (like Ridge).
+
+##### Works well when there are many features.
+
+### How to find alpha and lambda?
+
+```{r}
+
+library(caret)
+data.new <- data.frame(y_var,x_var)
+set.seed(123)
+model_ER <- train(
+  y_var~.,data=data.new, method = "glmnet",
+  trControl = trainControl("cv", number = 10),
+  tuneLength = 10
+)
+# Best tuning parameter
+model_ER$bestTune
+
+```
+
+### Coefficient of the final model:
+
+```{r}
+coef(model_ER$finalModel, model_ER$bestTune$lambda)
+```
+
+### R-squared of the elastic net regression model
+
+```{r}
+y_predicted <- predict(model_ER, newx = x_var)
+
+#find SST and SSE
+sst <- sum((y_var - mean(y_var))^2)
+sse <- sum((y_predicted - y_var)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+```
+## Lars Algorithm
+
+Least-angle regression (LARS) is a method used to select important variables in linear regression, especially when there are many variables.
+
+Simple Explanation:
+1. Start by normalizing all variables (so they have zero mean and unit variance).
+
+2. Find the most correlated variable with the target (the one that best explains the output).
+
+3. Move in that direction (adjust the regression model towards that variable).
+
+4. If another variable becomes equally correlated, adjust the model in a direction that balances both variables.
+
+5. Repeat until all important variables are included or the model is complex enough.
+
+```{r}
+
+library(lars)
+Lars_obj <- lars(x_var,y_var,type="lar")
+Lars_obj
+
+```
+```{r}
+plot(Lars_obj)
+```
+
+
+### Advantages of using LARS:
+ 
+Computationally as fast as forward selection but may sometimes be more accurate.
+
+Numerically very efficient when the number of features is much larger than the number of data instances.
+
+It can easily be modified to produce solutions for other estimators.
+
+### Disadvantages of using LARS:
+
+LARS is highly sensitive to noise and can produce unpredictable results sometimes.
+
+### Inclass-Assignment
+
+```{r}
+library(MASS)
+data("Boston")
+#colnames(Boston)
+#head(Boston)
+```
+
+```{r}
+library(glmnet)
+x_data <- data.matrix(Boston[,c("crim","zn","indus","chas","nox","rm","age","dis","rad","tax","ptratio","black","lstat")])
+y_data <- Boston[,"medv"]
+
+
+set.seed(123)
+cv_model <-cv.glmnet(x_data,y_data,alpha=0)
+best_lambda <- cv_model$lambda.min
+
+model_Ridge<- glmnet(x_data,y_data,alpha =0 ,lambda=best_lambda)
+coef(model_Ridge)
+
+
+```
+
+```{r}
+y_predicted <- predict(model_Ridge, s = best_lambda, newx = x_data)
+
+#find SST and SSE
+sst <- sum((y_data - mean(y_data))^2)
+sse <- sum((y_predicted - y_data)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+
+```
+

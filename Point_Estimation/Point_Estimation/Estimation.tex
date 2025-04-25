@@ -1,0 +1,236 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Maximum Likelihood Estimators},
+  pdfauthor={S20426},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Maximum Likelihood Estimators}
+\author{S20426}
+\date{2025-03-14}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generate synthetic data from an exponential distribution}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{rexp}\NormalTok{(}\DecValTok{100}\NormalTok{, }\AttributeTok{rate =} \FloatTok{0.1}\NormalTok{)}
+
+\CommentTok{\# Likelihood function for the exponential distribution}
+\NormalTok{log\_likelihood }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(lambda) \{}
+  \FunctionTok{sum}\NormalTok{(}\FunctionTok{dexp}\NormalTok{(data, }\AttributeTok{rate =}\NormalTok{ lambda, }\AttributeTok{log =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{\}}
+
+\CommentTok{\# Maximum Likelihood Estimation using optim}
+\NormalTok{result }\OtherTok{\textless{}{-}} \FunctionTok{optim}\NormalTok{(}\AttributeTok{par =} \FloatTok{0.1}\NormalTok{, log\_likelihood, }\AttributeTok{method =} \StringTok{"Brent"}\NormalTok{, }\AttributeTok{lower =} \FloatTok{0.001}\NormalTok{, }\AttributeTok{upper =} \DecValTok{10}\NormalTok{)}
+\NormalTok{mle\_lambda }\OtherTok{\textless{}{-}}\NormalTok{ result}\SpecialCharTok{$}\NormalTok{par}
+
+\CommentTok{\# Print the MLE estimate}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Maximum Likelihood Estimate for Lambda:"}\NormalTok{, mle\_lambda, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Maximum Likelihood Estimate for Lambda: 10
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 4.3.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot the histogram of the data with the estimated lambda}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =} \ConstantTok{NULL}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ data)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins =} \DecValTok{15}\NormalTok{, }\AttributeTok{fill =} \StringTok{"skyblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ mle\_lambda, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{annotate}\NormalTok{(}\StringTok{"text"}\NormalTok{, }\AttributeTok{x =}\NormalTok{ mle\_lambda }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{, }\AttributeTok{y =} \DecValTok{10}\NormalTok{, }
+           \AttributeTok{label =} \FunctionTok{paste}\NormalTok{(}\StringTok{"MLE Lambda:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(mle\_lambda, }\DecValTok{2}\NormalTok{)), }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Histogram with Estimated Lambda"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Time"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Estimation_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\subsubsection{Example 01}\label{example-01}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ?optimize}
+
+\NormalTok{log\_likelihood }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(p) \{}
+  
+\NormalTok{  x }\OtherTok{\textless{}{-}} \DecValTok{103}
+\NormalTok{  n }\OtherTok{\textless{}{-}} \DecValTok{200}
+  
+ 
+  \ControlFlowTok{if}\NormalTok{ (p }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{||}\NormalTok{ p }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(}\SpecialCharTok{{-}}\ConstantTok{Inf}\NormalTok{)  }\CommentTok{\# To avoid log(0) which is undefined}
+\NormalTok{  \}}
+  \FunctionTok{return}\NormalTok{(x }\SpecialCharTok{*} \FunctionTok{log}\NormalTok{(p) }\SpecialCharTok{+}\NormalTok{ (n }\SpecialCharTok{{-}}\NormalTok{ x) }\SpecialCharTok{*} \FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ p))}
+\NormalTok{\}}
+
+
+\NormalTok{result }\OtherTok{\textless{}{-}} \FunctionTok{optimize}\NormalTok{(log\_likelihood, }\AttributeTok{interval =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{maximum =} \ConstantTok{TRUE}\NormalTok{)}
+
+
+\NormalTok{result}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $maximum
+## [1] 0.5150064
+## 
+## $objective
+## [1] -138.5394
+\end{verbatim}
+
+\subsubsection{Example 02}\label{example-02}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{weights }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{59.001}\NormalTok{, }\FloatTok{38.267}\NormalTok{, }\FloatTok{41.025}\NormalTok{, }\FloatTok{35.555}\NormalTok{, }\FloatTok{46.690}\NormalTok{, }\FloatTok{20.994}\NormalTok{, }\FloatTok{39.407}\NormalTok{, }\FloatTok{52.780}\NormalTok{, }
+             \FloatTok{57.495}\NormalTok{, }\FloatTok{52.416}\NormalTok{, }\FloatTok{60.062}\NormalTok{, }\FloatTok{48.149}\NormalTok{, }\FloatTok{40.182}\NormalTok{, }\FloatTok{50.929}\NormalTok{, }\FloatTok{49.472}\NormalTok{, }\FloatTok{49.197}\NormalTok{, }
+             \FloatTok{43.459}\NormalTok{, }\FloatTok{40.493}\NormalTok{, }\FloatTok{60.196}\NormalTok{, }\FloatTok{58.590}\NormalTok{, }\FloatTok{53.645}\NormalTok{, }\FloatTok{53.837}\NormalTok{, }\FloatTok{61.134}\NormalTok{, }\FloatTok{62.115}\NormalTok{, }
+             \FloatTok{46.517}\NormalTok{, }\FloatTok{41.404}\NormalTok{, }\FloatTok{56.500}\NormalTok{, }\FloatTok{53.281}\NormalTok{, }\FloatTok{44.821}\NormalTok{, }\FloatTok{47.610}\NormalTok{, }\FloatTok{51.178}\NormalTok{, }\FloatTok{58.315}\NormalTok{, }
+             \FloatTok{34.411}\NormalTok{, }\FloatTok{47.795}\NormalTok{, }\FloatTok{41.828}\NormalTok{, }\FloatTok{60.767}\NormalTok{, }\FloatTok{60.797}\NormalTok{, }\FloatTok{51.421}\NormalTok{, }\FloatTok{51.570}\NormalTok{, }\FloatTok{48.313}\NormalTok{, }
+             \FloatTok{47.310}\NormalTok{, }\FloatTok{58.078}\NormalTok{, }\FloatTok{38.753}\NormalTok{, }\FloatTok{35.692}\NormalTok{, }\FloatTok{50.604}\NormalTok{, }\FloatTok{42.070}\NormalTok{, }\FloatTok{53.403}\NormalTok{, }\FloatTok{47.405}\NormalTok{, }
+             \FloatTok{36.952}\NormalTok{, }\FloatTok{53.682}\NormalTok{)}
+
+\NormalTok{normal }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x,data)(}
+  
+  \FunctionTok{return}\NormalTok{ (}
+    \FunctionTok{sum}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x,}\FunctionTok{mean}\NormalTok{(data),}\FunctionTok{sd}\NormalTok{(data),}\AttributeTok{log =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  )}
+\NormalTok{)}
+
+\NormalTok{result }\OtherTok{\textless{}{-}} \FunctionTok{optimize}\NormalTok{(normal,}\AttributeTok{interval =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{100}\NormalTok{,}\SpecialCharTok{+}\DecValTok{100}\NormalTok{),}\AttributeTok{data=}\NormalTok{weights, }\AttributeTok{maximum =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{result}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $maximum
+## [1] 48.71134
+## 
+## $objective
+## [1] -3.086087
+\end{verbatim}
+
+\section{Confidence Interval for
+Mean}\label{confidence-interval-for-mean}
+
+\subsection{Case 1: When data is normal/ large sample and σ is
+known.}\label{case-1-when-data-is-normal-large-sample-and-ux3c3-is-known.}
+
+\end{document}

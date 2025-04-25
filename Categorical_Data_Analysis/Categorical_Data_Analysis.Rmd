@@ -1,0 +1,242 @@
+---
+title: "Categorical Data Analysis"
+author: "S20426"
+date: "2025-04-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(catdata)
+library(ggplot2)
+library(lsr)
+```
+
+
+### Nominal Data: 
+#### Definition:
+Nominal data is used to label or categorize data without any inherent order or ranking.
+
+#### Examples:
+Gender (male, female), eye color (blue, brown, green), types of fruits (apple, banana, orange).
+
+#### Characteristics:
+The order of categories is not meaningful, and there's no concept of "more" or "less". 
+
+### Ordinal Data: 
+
+#### Definition:
+Ordinal data represents categories with a meaningful order or ranking, but the intervals between categories are not necessarily equal.
+
+#### Examples:
+Education level (high school, bachelor's, master's), rating on a scale (1-5 stars), survey responses (strongly disagree, disagree, neutral, agree, strongly agree).
+
+#### Characteristics:
+The order of categories is important, but the difference between adjacent categories might not be equal. 
+
+### Binary Data: 
+
+#### Definition:
+Binary data is a type of nominal data with only two possible values or categories, often representing a choice between "yes" and "no," "true" and "false," or "0" and "1".
+
+#### Examples:
+Whether a customer has purchased a product (yes or no), whether a light switch is on or off, the result of a coin flip (heads or tails).
+
+#### Characteristics:
+It's a specific type of nominal data where the categories are mutually exclusive and exhaustive.
+
+### Why use factors?
+
+Factors are especially useful in statistical modeling, plotting, and when you want to treat data as categories rather than continuous values.
+
+```{r}
+#library(catdata)
+data(knee)
+head(knee)
+```
+N :
+Patient's number
+
+Th :
+Therapy ( placebo = 1, treatment = 2)
+
+Age :
+Age in years
+
+Sex :
+Gender (male = 0, female = 1)
+
+R1 :
+Pain before treatment (no pain = 1, severe pain = 5)
+
+R2 :
+Pain after three days of treatment
+
+R3 :
+Pain after seven days of treatment
+
+R4 :
+Pain after ten days of treatment
+
+## Check the structure of the data 
+```{r}
+str(knee)
+```
+
+## Convert into factor variables
+
+```{r}
+knee$Th <- as.factor(knee$Th)
+knee$Sex <- as.factor(knee$Sex)
+str(knee)
+## you can see how many levels in the columns
+```
+
+## Changing factor levels
+
+```{r}
+levels(knee$Th) <- c("Placebo","Treatment") 
+levels(knee$Sex) <-c("Male","Female")
+head(knee)
+```
+## Creating tabulated summaries
+
+```{r}
+t_1=table(knee$Th)
+t_1
+```
+
+```{r}
+prop.table(t_1)
+```
+```{r}
+t_2=table(knee$Th,knee$Sex)
+t_2
+```
+
+```{r}
+prop.table(t_2)
+```
+## Using CrossTable function in gmodels package
+
+```{r}
+library(gmodels)
+CrossTable(table(knee$Th,knee$Sex))
+```
+
+## Categorical Data Visulization
+
+```{r}
+#library(ggplot2)
+ggplot(knee, aes(x = R2, fill = Th)) + geom_bar(position = "dodge") +
+  labs(x = "Pain after trteatment", 
+       y = "Number of patients", 
+       fill = "Treatment")
+```
+
+## Chi-square goodness of fit test
+
+A statistical hypothesis test used to determine whether a variable is likely to come from a specified distribution or not.
+
+In Knee injuries dataset, let’s check whether the patients were randomly allocated to the treatment and placebo groups.
+
+Null hypothesis: Ptrt=Pplc=0.5
+
+```{r}
+probabilities <- c(Treatment = .5, Placebo = .5) 
+probabilities
+```
+```{r}
+library(lsr)
+goodnessOfFitTest(x=knee$Th) # No need to input probabilities if they are equal
+```
+### Test results:
+
+Chi-square statistic = 0.008
+This is a very small number, meaning the observed and expected counts are almost the same.
+
+### Degrees of freedom (df) = 1
+
+Since there are 2 categories (Treatment and Placebo), df = 2 - 1 = 1.
+
+### p-value = 0.929
+
+This is a very high p-value.
+
+### Interpretation:
+
+Since the p-value is much greater than 0.05, we fail to reject the null hypothesis.
+that means there’s no significant difference between observed and expected group sizes.
+
+
+### Another Method
+
+```{r}
+chisq.test(x=table(knee$Th))
+```
+
+
+
+## Chi-square test of Independence
+
+A hypothesis test used to determine whether two categorical or nominal variables are likely to be related or not.
+
+In Knee injuries dataset, let’s check whether the variables Th and R2 are independent or not
+
+
+```{r}
+#library(lsr)
+knee$R2<-as.factor(knee$R2)
+associationTest( formula = ~Th+R2, data = knee )
+```
+### Another Method (Independence)
+
+```{r}
+T3=table(knee$Th,knee$R2)
+chisq.test(T3)
+```
+
+## Assumptions of chi-square test
+
+### Expected frequencies are sufficiently large.
+
+If this assumption is violated
+If your expected cell counts are too small, check out the Fisher exact test.
+
+As can be seen it does not calculate a test statistic.
+
+```{r}
+T3=table(knee$Th,knee$R2)
+fisher.test(T3)
+```
+
+
+### Observations are independent.
+
+If observations are not independent
+It may be possible to use the McNemar test or the Cochran test.
+
+```{r}
+R2.merge=factor(ifelse(knee$R2==1 | knee$R2==2,1,2))
+R3.merge=ifelse(knee$R3==1 | knee$R3==2,1,2)
+T4=table(R2.merge,R3.merge)
+mcnemar.test(T4)
+```
+## Odds Ratio and 95% CI
+
+```{r}
+library(vcd) # install the package first
+T5 <-table(knee$R4,knee$Th)
+odds.2cb <- oddsratio(T5,log=F) # computes the odds ratio
+summary(odds.2cb) # summary displays the odds ratio
+```
+```{r}
+confint(odds.2cb) # displays the confidence intervals
+```
+
+### Plot the odds ratio and their respective confidence intervals.
+
+```{r}
+plot(odds.2cb, main = "Relative Odds of Placebo", xlab = "Pain after treatment", ylab = "Odds Ratio, 95% CI")
+```
+

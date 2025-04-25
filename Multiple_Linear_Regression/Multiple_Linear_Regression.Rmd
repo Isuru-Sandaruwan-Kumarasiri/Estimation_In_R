@@ -137,10 +137,10 @@ summary(step.model)
 
 ### II.drop1SignifReg() (Significance-Based Backward Elimination)
 
-* Drops one variable at a time based on p-value until only significant variables (p < 0.05)   remain.
-* Uses hypothesis testing to justify variable inclusion.
+    * Drops one variable at a time based on p-value until only significant variables (p < 0.05)   remain.
+    * Uses hypothesis testing to justify variable inclusion.
 
-* More statistically rigorous but may remove useful variables if their effect is small.
+    * More statistically rigorous but may remove useful variables if their effect is small.
 
 ```{r}
 library(SignifReg)
@@ -162,18 +162,18 @@ summary(Sub.model)
 
 ```
 
-* Type.M (p = 0.597) and LongestShell (p = 0.977) have very high p-values.
-* Normally, these should be removed.
-* However, they might remain due to interactions, multicollinearity, or their effect on the overall model stability.
-* The function ensures that the model performs well as a whole rather than strictly eliminating variables with high p-values.
+    * Type.M (p = 0.597) and LongestShell (p = 0.977) have very high p-values.
+    * Normally, these should be removed.
+    * However, they might remain due to interactions, multicollinearity, or their effect on the overall model stability.
+    * The function ensures that the model performs well as a whole rather than strictly eliminating variables with high p-values.
 
 
 ## 02 Forward Selection
 
-1. Choose the significance level (SL = 0.05).
-2. Fit all possible simple regression models and select the one with the lowest P-value.
-3. Keep this variable and fit all possible models with one extra predictor added to the one you already have.
-4. Find the predictor with the lowest P-value. If P < Sl, go back to step 3. Otherwise, you’re done!
+    1. Choose the significance level (SL = 0.05).
+    2. Fit all possible simple regression models and select the one with the lowest P-value.
+    3. Keep this variable and fit all possible models with one extra predictor added to the one you already have.
+    4. Find the predictor with the lowest P-value. If P < Sl, go back to step 3. Otherwise, you’re done!
 
 ### I Forward selection using SignifReg package
 
@@ -189,13 +189,13 @@ summary(sub.model2)
 ### II Stepwise Regression
 
 
-1.Select a significance level to enter and a significance level to stay.
+    1.Select a significance level to enter and a significance level to stay.
 
-2.Perform the next step of forward selection where you add the new variable.
+    2.Perform the next step of forward selection where you add the new variable.
 
-3.Now perform all of the steps of backward elimination.
+    3.Now perform all of the steps of backward elimination.
 
-4.Now head back to step two, then move forward to step 3, and so on until no new variables can enter and no new variables can exit.
+    4.Now head back to step two, then move forward to step 3, and so on until no new variables can enter and no new variables can exit.
 ```{r}
 model2 <-  lm(Rings~Type.I + Type.M+ LongestShell+ Diameter+ WholeWeight+ ShuckedWeight+ VisceraWeight+ ShellWeight,data=abalone)
 step.model2 <- step(model2, direction = "forward", trace=FALSE)
@@ -236,4 +236,129 @@ lower than backward elimination because it starts from scratch.
 
 #   Model Diagnosis
 
+Regression diagnostics are used to evaluate the model assumptions and investigate whether or not there are observations with a large, undue influence on the analysis.
+
+
+## Model Assumptions
+
+Before using a regression model for interpreting the data, we must check that the model assumptions are met.
+
+Basic assumptions of regression models:
+
+     1. Linearity of the data: The relationship between the predictor (x) and the outcome (y) is assumed to be linear.
+
+    2. Normality of residuals: The residual errors are assumed to be normally distributed.
+
+    3. Homogeneity of residuals variance: The residuals are assumed to have a constant variance (homoscedasticity)
+
+    4. Independence of residuals error terms.
+
+
+
+```{r}
+par(mfrow =c(2,2))
+
+# par() function in R is used to set or query graphical parameters.
+#mfrow stands for "multi-frame row-wise layout" and determines how multiple plots are arranged in #a single plotting window.
+#c(2,2) means divide the plotting area into a 2×2 grid, meaning 4 plots will be displayed in a 2-row, 2-column format.
+
+plot(step.model2)
+
+```
+
+## Using ggfortify Package 
+
+```{r}
+par(mfrow = c(2, 2)) 
+library(ggfortify) 
+autoplot(step.model2)
+
+```
+The diagnostic plots show residuals in four different ways:
+
+    1. Residuals vs Fitted: to check the linear relationship assumptions.
+
+    2. Normal Q-Q: to examine whether the residuals are normally distributed.
+
+    3. Scale-Location (or Spread-Location): to check the homogeneity of variance of the residuals (homoscedasticity).
+
+    4. Residuals vs Leverage: to identify extreme values that might influence the regression analysis.
+
+
+# Identifying Influential OutLiers
+
+An outlier is a point which is often distant from the others.
+
+It is a point with a large value of its residual.
+
+Different residual measures can be used to identify outliers.
+
+     1. Standardised residuals
+
+     2. Studentized residuals
+
+     3. Cook’s distance
+
+
+
+### 1. Standardised residuals
+
+```{r}
+standard_res=rstandard(step.model2)
+plot(fitted(step.model2), standard_res)
+```
+
+
+#### Standardized residuals are “mostly” between 2 and 2, but they are dependent.
+
+### 1. Studentized residuals
+
+```{r}
+student_res=rstudent(step.model2)
+plot(fitted(step.model2), student_res)
+```
+
+For an outlier the absolute values of its Studentized residual is greater than the 0.975th quantile of the Student distribution with n−p−2
+ degrees of freedom
+
+
+## Cook’s Distance
+
+    It is calculated by removing the ith data point from the model and refitting the regression model.
+
+    It summarizes how much all the values in the regression model change when the ith observation is removed.
+
+    The formula for Cook’s distance is:
+        
+        Di = (Sum(Yj-Yj^-i)^2)/(p+1)s^2
+        
+    An R function to calculate Cook’s distance is cooks.distance().
+    
+    
+```{r}
+dist_cook=cooks.distance(step.model2)
+plot(dist_cook, type="h")
+```
+  
+  
+  
+## Checking for multicollinearity
+
+    It is a statistical terminology where more than one independent variable is correlated with each other.
+
+    Results in reducing the reliability of statistical inferences.
+
+    Hence, these variables must be removed when building a multiple regression model.
+
+    Variance inflation factor (VIF) is used for detecting the multicollinearity in a model.
+    
+    
+## Variance inflation factor
+
+```{r}
+library(car)
+vif_values <- vif(step.model2)          
+barplot(vif_values, main = "VIF Values", horiz = TRUE, col = "steelblue") 
+abline(v = 5, lwd = 3, lty = 2)    
+```
 
